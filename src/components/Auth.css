@@ -1,0 +1,84 @@
+/* src/components/Auth.css */
+/* src/index.css */
+
+
+/* src/components/Auth.css */
+
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--background-primary);
+}
+
+.auth-toggle {
+  display: flex;
+  margin-bottom: 20px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  padding: 5px;
+}
+
+.auth-toggle button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.auth-toggle button.active {
+  background: var(--background-tertiary);
+  color: var(--accent-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: var(--background-secondary);
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid var(--border-color);
+}
+
+.auth-form h2 {
+  margin-bottom: 10px;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.auth-form input {
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.auth-form button {
+  padding: 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--accent-primary);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.auth-form button:hover {
+  background-color: var(--accent-hover);
+}

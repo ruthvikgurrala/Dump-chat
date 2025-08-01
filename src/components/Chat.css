@@ -1,0 +1,323 @@
+/* src/components/Chat.css */
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--background-primary);
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: var(--background-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0; /* Prevents header from shrinking */
+}
+
+.chat-header h1 {
+  color: var(--text-primary);
+}
+
+.header-controls {
+  position: relative;
+}
+
+.settings-btn {
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px;
+  color: var(--text-secondary);
+}
+
+/* This is a general button style, we will override it where needed */
+.chat-header button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--accent-primary);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.chat-header button:hover {
+  background-color: var(--accent-hover);
+}
+
+.chat-body {
+  display: flex;
+  flex: 1;
+  min-height: 0; /* CRITICAL: Allows flex children to shrink */
+  overflow-x: hidden;
+}
+
+
+
+.sidebar {
+  background-color: var(--background-secondary);
+  border-right: 1px solid var(--border-color);
+  width: 100%;
+  color: var(--text-primary);
+  flex-shrink: 0; /* Prevent from shrinking */
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0; /* Prevent from shrinking */
+  transition: margin-left 0.3s ease-in-out; /* Animate the slide */
+}
+
+.chat-window {
+  width: 100%;
+  background-color: var(--background-secondary);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0; /* Prevent from shrinking */
+}
+
+/* This class will be added by React to trigger the slide */
+.chat-body.show-chat-window .sidebar {
+  margin-left: -100%;
+}
+
+.chat-window-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.chat-window-empty h2 {
+  color: var(--text-secondary);
+}
+
+.chat-window-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0; /* CRITICAL: Prevents header from shrinking */
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 10px 0 0;
+}
+
+.sidebar-search {
+  display: flex;
+  margin: 20px;
+  margin-bottom: 0;
+  flex-shrink: 0; /* CRITICAL: Prevents search from shrinking */
+}
+
+.sidebar-search input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  border-radius: 5px 0 0 5px;
+  outline: none;
+}
+
+.sidebar-search input::placeholder {
+  color: var(--text-secondary);
+}
+
+.sidebar-search button {
+  padding: 10px 15px;
+  border: 1px solid var(--border-color);
+  border-left: none;
+  background-color: var(--accent-primary);
+  color: white;
+  cursor: pointer;
+  border-radius: 0 5px 5px 0;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 20px 0;
+}
+
+/* CRITICAL: New container for scrollable sidebar content */
+.sidebar-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Allows this container to shrink */
+  margin: 20px;
+  margin-top: 20px;
+}
+
+.sidebar h4 {
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-bottom: 10px;
+  flex-shrink: 0; /* Prevents headers from shrinking */
+}
+
+/* CRITICAL: Make these containers scrollable */
+.active-chats-list, .sidebar-results {
+  flex: 1;
+  overflow-y: auto; /* Enable scrolling */
+  padding: 0 5px;
+  min-height: 0; /* Allows container to shrink */
+}
+
+.search-result-item, .active-chat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: var(--background-tertiary);
+  border-radius: 5px;
+  margin-bottom: 5px; /* Add spacing between items */
+  flex-shrink: 0; /* Prevent individual items from shrinking */
+}
+
+.active-chat-item {
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.active-chat-item:hover {
+  background-color: var(--background-tertiary);
+}
+
+.active-chat-item.selected {
+  background-color: var(--accent-primary);
+  color: white;
+}
+
+.search-result-item button {
+  background-color: var(--accent-primary);
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  transition: transform 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 2px;
+  flex-shrink: 0; /* Prevent button from shrinking */
+}
+
+.search-result-item button:hover {
+    transform: scale(1.1);
+}
+
+.error-message {
+  color: #ff4d4d;
+  text-align: center;
+  padding: 10px 0;
+  flex-shrink: 0; /* Prevent error message from shrinking */
+}
+
+.no-chats-message {
+  color: var(--text-secondary);
+  font-style: italic;
+  font-size: 14px;
+  text-align: center;
+  padding: 20px 0;
+  flex-shrink: 0; /* Prevent message from shrinking */
+}
+
+/* CRITICAL: Make messages list scrollable and flexible */
+.messages-list {
+  flex: 1;
+  overflow-y: auto; /* Enable scrolling */
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0; /* Allows container to shrink */
+}
+
+.message {
+  padding: 10px 15px;
+  border-radius: 20px;
+  max-width: 70%;
+  word-wrap: break-word;
+  flex-shrink: 0; /* Prevent individual messages from shrinking */
+}
+
+.message.sent {
+  background-color: var(--accent-primary);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 5px;
+}
+
+.message.received {
+  background-color: var(--background-tertiary);
+  color: var(--text-primary);
+  align-self: flex-start;
+  border-bottom-left-radius: 5px;
+}
+
+.message-input-form {
+  display: flex;
+  padding: 15px 20px;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0; /* CRITICAL: Prevents input form from shrinking */
+}
+
+.message-input-form input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  background-color: var(--background-secondary);
+  color: var(--text-primary);
+  border-radius: 20px;
+  outline: none;
+}
+
+.message-input-form button {
+  padding: 0 20px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 20px;
+  background-color: var(--accent-primary);
+  color: white;
+  cursor: pointer;
+}
+
+/* --- Media Query for Desktop View --- */
+@media (min-width: 768px) {
+  .chat-body.show-chat-window .sidebar {
+    margin-left: 0;
+  }
+
+  /* Give the sidebar a fixed width and prevent it from shrinking. */
+  .sidebar {
+    width: 350px;
+    flex-shrink: 0; /* This ensures the sidebar is always 350px wide. */
+  }
+
+  /* Make the chat window grow to fill the remaining available space. */
+  .chat-window {
+    width: auto; /* 'auto' is better than a fixed value here. */
+    flex: 1;     /* This is shorthand for flex-grow: 1, flex-shrink: 1. */
+  }
+  
+
+}

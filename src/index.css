@@ -1,0 +1,40 @@
+/* src/index.css */
+
+body.dark-theme {
+  --background-primary: #121212;
+  --background-secondary: #1e1e1e;
+  --background-tertiary: #2a2a2a;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --border-color: #3a3a3a;
+}
+
+body.light-theme {
+  --background-primary: #f0f2f5;
+  --background-secondary: #ffffff;
+  --background-tertiary: #e9ecef;
+  --text-primary: #1c1e21;
+  --text-secondary: #65676b;
+  --border-color: #ced4da;
+}
+
+:root {
+  --accent-primary: #007bff;
+  --accent-hover: #0056b3;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
+  overflow-x: hidden; /* NEW: The definitive safeguard */
+}
