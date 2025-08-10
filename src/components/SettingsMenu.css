@@ -1,15 +1,18 @@
 /* src/components/SettingsMenu.css */
 .settings-menu {
   position: absolute;
-  top: 60px; /* Position below the header */
+  top: 60px;
   right: 20px;
-  background-color: var(--background-secondary);
+  background-color: rgba(var(--rgb-secondary), 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  width: 250px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.03);
+  width: 270px;
   z-index: 100;
   color: var(--text-primary);
+  overflow: hidden;
 }
 
 .menu-header {
@@ -21,28 +24,23 @@
 
 .settings-menu ul {
   list-style: none;
-  padding: 10px 0;
+  padding: 8px 0;
 }
 
 .settings-menu li {
-  padding: 12px 20px;
-  cursor: pointer;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 15px;
+  transition: background-color 0.2s ease;
 }
 
 .settings-menu li:hover {
   background-color: var(--background-tertiary);
 }
 
-/* src/components/SettingsMenu.css */
-
-/* Add these styles to the bottom */
-.settings-menu li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
+/* Switch styling */
 .switch {
   position: relative;
   display: inline-block;
@@ -59,10 +57,7 @@
 .slider {
   position: absolute;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background-color: #ccc;
   transition: .4s;
 }
@@ -70,10 +65,8 @@
 .slider:before {
   position: absolute;
   content: "";
-  height: 20px;
-  width: 20px;
-  left: 4px;
-  bottom: 4px;
+  height: 20px; width: 20px;
+  left: 4px; bottom: 4px;
   background-color: white;
   transition: .4s;
 }
@@ -89,7 +82,39 @@ input:checked + .slider:before {
 .slider.round {
   border-radius: 34px;
 }
-
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* Theme dropdown */
+.theme-select {
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+}
+
+/* Accent color swatches */
+.accent-swatches {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.accent-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s ease;
+}
+
+.accent-swatch:hover {
+  transform: scale(1.1);
+}
+
+.accent-swatch.selected {
+  border-color: var(--accent-primary);
 }

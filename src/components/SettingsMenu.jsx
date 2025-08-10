@@ -1,65 +1,101 @@
 // src/components/SettingsMenu.jsx
-
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import './SettingsMenu.css';
+import { motion } from 'framer-motion';
 
-const SettingsMenu = ({ user, isDarkMode, setIsDarkMode }) => {
+const themes = ["linear-dark", "solarized-light", "cyberpunk", "forest"];
+const accents = ["#7E22CE", "#10B981", "#F59E0B", "#E11D48", "#06B6D4", "#3B82F6", "#84CC16", "#F43F5E"];
+
+// --- FIX: Receive and use props for theme and accent from parent ---
+const SettingsMenu = ({ user, onAutoDumpChange, theme, setTheme, accent, setAccent }) => {
   const [isAutoDumpOn, setIsAutoDumpOn] = useState(true);
-
-  // Effect to get the user's auto-dump preference from Firestore
+  
   useEffect(() => {
     const fetchUserPreferences = async () => {
       if (user) {
         const userRef = doc(db, 'users', user.uid);
         const userSnap = await getDoc(userRef);
-        if (userSnap.exists() && userSnap.data().autoDump !== undefined) {
-          setIsAutoDumpOn(userSnap.data().autoDump);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          if (data.autoDump !== undefined) setIsAutoDumpOn(data.autoDump);
         }
       }
     };
     fetchUserPreferences();
   }, [user]);
 
-  const handleThemeToggle = () => {
-    setIsDarkMode(!isDarkMode);
+  const savePref = async (field, value) => {
+    if (!user) return;
+    await setDoc(doc(db, 'users', user.uid), { [field]: value }, { merge: true });
+  };
+
+  // --- FIX: Handlers now call the functions passed down via props ---
+  const handleThemeChange = (newTheme) => {
+    setTheme(newTheme);
+    savePref("theme", newTheme);
+  };
+
+  const handleAccentChange = (newColor) => {
+    setAccent(newColor);
+    savePref("accent", newColor);
   };
 
   const handleDumpToggle = async () => {
     const newAutoDumpState = !isAutoDumpOn;
-    
-    try {
-      const userRef = doc(db, "users", user.uid);
-      await setDoc(userRef, { autoDump: newAutoDumpState }, { merge: true });
-      setIsAutoDumpOn(newAutoDumpState); // Update state only after successful save
-    } catch (error) {
-      console.error("Failed to save preference:", error);
-      alert("Could not save your setting. Please try again.");
-    }
+    setIsAutoDumpOn(newAutoDumpState);
+    savePref("autoDump", newAutoDumpState);
+    if (newAutoDumpState) savePref("savedChats", []);
+    onAutoDumpChange(newAutoDumpState);
   };
-  
+
   const handleLogout = () => {
     auth.signOut();
   };
 
   return (
-    <div className="settings-menu">
+    <motion.div 
+      className="settings-menu"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+    >
       <div className="menu-header">
         Signed in as <br />
         <strong>{user.displayName || user.email}</strong>
       </div>
       <ul>
         <li>
-          <span>Dark Theme</span>
-          <label className="switch">
-            <input type="checkbox" checked={isDarkMode} onChange={handleThemeToggle} />
-            <span className="slider round"></span>
-          </label>
+          <span>Theme</span>
+          <select
+            className="theme-select"
+            value={theme} // Controlled by the 'theme' prop
+            onChange={(e) => handleThemeChange(e.target.value)}
+          >
+            {themes.map((t) => (
+              <option key={t} value={t}>
+                {t.replace("-", " ")}
+              </option>
+            ))}
+          </select>
         </li>
         <li>
-          <span>Auto-Dump Chats</span>
-           <label className="switch">
+          <span>Accent</span>
+          <div className="accent-swatches">
+            {accents.map((c) => (
+              <div
+                key={c}
+                className={`accent-swatch ${accent === c ? 'selected' : ''}`} // Controlled by the 'accent' prop
+                style={{ backgroundColor: c }}
+                onClick={() => handleAccentChange(c)}
+              />
+            ))}
+          </div>
+        </li>
+        <li>
+          <span>Auto-Dump</span>
+          <label className="switch">
             <input type="checkbox" checked={isAutoDumpOn} onChange={handleDumpToggle} />
             <span className="slider round"></span>
           </label>
@@ -68,7 +104,7 @@ const SettingsMenu = ({ user, isDarkMode, setIsDarkMode }) => {
           Sign Out
         </li>
       </ul>
-    </div>
+    </motion.div>
   );
 };
 
