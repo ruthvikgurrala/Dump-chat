@@ -246,9 +246,19 @@ const Sidebar = ({ onStartChat, activeChats, onSelectChat, selectedChat, onViewU
                                 onClick={() => onSelectChat(chatUser)}
                             >
                                 {chatUser.profilePicUrl ? (
-                                    <img src={chatUser.profilePicUrl} alt={chatUser.username} className="chat-list-pic" />
+                                    <img
+                                        src={chatUser.profilePicUrl}
+                                        alt={chatUser.username}
+                                        className="chat-list-pic clickable-profile"
+                                        onClick={(e) => { e.stopPropagation(); onViewUser(chatUser.uid); }}
+                                    />
                                 ) : (
-                                    <div className="chat-list-placeholder">{chatUser.username.charAt(0).toUpperCase()}</div>
+                                    <div
+                                        className="chat-list-placeholder clickable-profile"
+                                        onClick={(e) => { e.stopPropagation(); onViewUser(chatUser.uid); }}
+                                    >
+                                        {chatUser.username.charAt(0).toUpperCase()}
+                                    </div>
                                 )}
                                 <span className="chat-list-username">{chatUser.username}</span>
 

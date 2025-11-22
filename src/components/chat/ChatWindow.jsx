@@ -336,22 +336,6 @@ const ChatWindow = ({ selectedChat, onBack, onMessageSent }) => {
         // Send to Firestore
         await addDoc(collection(db, 'chats', chatId, 'messages'), messageDataForFirestore);
 
-        // Update the optimistic message with real ID (handled in onSnapshot usually, 
-        // but we can also update locally if needed, though onSnapshot is safer)
-
-        const currentUserRef = doc(db, 'users', auth.currentUser.uid);
-        const selectedChatRef = doc(db, 'users', selectedChat.uid);
-        await Promise.allSettled([
-          updateDoc(currentUserRef, { savedChats: arrayRemove(selectedChat.uid) }),
-          updateDoc(currentUserRef, { savedChats: arrayUnion(selectedChat.uid) }),
-          updateDoc(selectedChatRef, { savedChats: arrayRemove(auth.currentUser.uid) }),
-          updateDoc(selectedChatRef, { savedChats: arrayUnion(auth.currentUser.uid) })
-        ]);
-
-        if (onMessageSent) onMessageSent(selectedChat);
-
-        const userRef = doc(db, 'users', auth.currentUser.uid);
-        const userSnap = await fetchSingleDoc(userRef);
         if (userSnap.exists()) {
           await updateDoc(userRef, { dailyMessageCount: (userSnap.data().dailyMessageCount || 0) + 1 }).catch(() => { });
         } else {

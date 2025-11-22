@@ -1,7 +1,7 @@
-// src/components/SettingsMenu.jsx
+// src/components/settings/SettingsMenu.jsx
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../../firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import './SettingsMenu.css';
 import { motion } from 'framer-motion';
 
@@ -10,7 +10,8 @@ const accents = ["#7E22CE", "#10B981", "#F59E0B", "#E11D48", "#06B6D4", "#3B82F6
 
 const SettingsMenu = ({ user, onAutoDumpChange, theme, setTheme, accent, setAccent, onShowPremium, onShowProfile }) => {
   const [isAutoDumpOn, setIsAutoDumpOn] = useState(true);
-  
+  const [username, setUsername] = useState(user?.displayName || 'User');
+
   useEffect(() => {
     const fetchUserPreferences = async () => {
       if (user) {
@@ -23,6 +24,18 @@ const SettingsMenu = ({ user, onAutoDumpChange, theme, setTheme, accent, setAcce
       }
     };
     fetchUserPreferences();
+  }, [user]);
+
+  // Listen for real-time username updates
+  useEffect(() => {
+    if (user?.uid) {
+      const unsubscribe = onSnapshot(doc(db, 'users', user.uid), (doc) => {
+        if (doc.exists()) {
+          setUsername(doc.data().username || 'User');
+        }
+      });
+      return () => unsubscribe();
+    }
   }, [user]);
 
   const savePref = async (field, value) => {
@@ -53,15 +66,26 @@ const SettingsMenu = ({ user, onAutoDumpChange, theme, setTheme, accent, setAcce
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="settings-menu"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
     >
-      <div className="menu-header">
-        Signed in as <br />
-        <strong>{user.displayName || user.email}</strong>
+      <div className="settings-header">
+        <div className="user-info">
+          {user?.photoURL ? (
+            <img src={user.photoURL} alt={username} className="settings-avatar" />
+          ) : (
+            <div className="settings-avatar-placeholder">
+              {username.charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div className="user-details">
+            <span className="settings-username">{username}</span>
+            <span className="settings-email">{user?.email}</span>
+          </div>
+        </div>
       </div>
       <ul>
         <li className="profile-item" onClick={onShowProfile}>
