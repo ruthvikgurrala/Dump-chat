@@ -34,10 +34,24 @@
   align-items: center;
   font-size: 15px;
   transition: background-color 0.2s ease;
+  cursor: pointer; /* Make list items clickable */
 }
 
 .settings-menu li:hover {
   background-color: var(--background-tertiary);
+}
+
+/* NEW: Style for premium list item */
+.settings-menu .premium-item {
+  color: var(--accent-primary);
+  font-weight: 600;
+  text-shadow: 0 0 5px rgba(var(--accent-rgb), 0.3);
+  transition: all 0.2s ease;
+}
+
+.settings-menu .premium-item:hover {
+  background-color: rgba(var(--accent-rgb), 0.1);
+  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3);
 }
 
 /* Switch styling */

@@ -1,0 +1,49 @@
+Folder PATH listing for volume New Volume
+Volume serial number is FC87-765D
+G:.
+|   App.css
+|   App.jsx
+|   firebase.js
+|   index.css
+|   main.jsx
+|   project_structure.txt
+|   
++---assets
+|       react.svg
+|       
+\---components
+    |   Chat.css
+    |   Chat.jsx
+    |   
+    +---admin
+    |       AdminDashboard.css
+    |       AdminDashboard.jsx
+    |       
+    +---authentication
+    |       Auth.css
+    |       Auth.jsx
+    |       
+    +---chat
+    |       ChatWindow.css
+    |       ChatWindow.jsx
+    |       MessageInput.css
+    |       MessageInput.jsx
+    |       MessageList.css
+    |       MessageList.jsx
+    |       Sidebar.css
+    |       Sidebar.jsx
+    |       
+    +---premium
+    |       GoPremium.css
+    |       GoPremium.jsx
+    |       
+    +---settings
+    |       SettingsMenu.css
+    |       SettingsMenu.jsx
+    |       
+    \---social
+            FriendRequests.css
+            FriendRequests.jsx
+            ProfilePage.css
+            ProfilePage.jsx
+            

@@ -1,8 +1,4 @@
 /* src/components/Auth.css */
-/* src/index.css */
-
-
-/* src/components/Auth.css */
 
 .auth-container {
   display: flex;
@@ -11,6 +7,7 @@
   align-items: center;
   height: 100vh;
   background-color: var(--background-primary);
+  padding: 20px;
 }
 
 .auth-toggle {
@@ -23,7 +20,7 @@
 
 .auth-toggle button {
   flex: 1;
-  padding: 10px;
+  padding: 10px 20px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -66,6 +63,7 @@
   color: var(--text-primary);
   border-radius: 5px;
   font-size: 16px;
+  width: 100%;
 }
 
 .auth-form button {
@@ -81,4 +79,49 @@
 
 .auth-form button:hover {
   background-color: var(--accent-hover);
+}
+
+/* --- NEW STYLES --- */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  background: none !important;
+  border: none !important;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 5px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.forgot-password-link {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-top: 10px;
+  text-decoration: none;
+}
+
+.forgot-password-link:hover {
+  color: var(--accent-primary);
+  text-decoration: underline;
+}
+
+.auth-error {
+  color: #ef4444;
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-message {
+  color: #22c55e;
+  text-align: center;
+  font-size: 14px;
 }

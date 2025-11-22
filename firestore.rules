@@ -1,0 +1,82 @@
+rules_version = '2';
+
+service cloud.firestore {
+  // Helper function to check if the requesting user is an admin
+  function isAdmin() {
+    return request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+  }
+
+  match /databases/{database}/documents {
+    
+    match /users/{userId} {
+      allow get, list: if request.auth.uid != null;
+      allow create: if request.auth.uid != null;
+      
+      // Allow update if:
+      // 1. User is updating their own doc
+      // 2. User is an Admin
+      // 3. User is updating ONLY the 'savedChats' field (to add themselves to someone's chat list)
+      allow update: if request.auth.uid == userId 
+                    || isAdmin()
+                    || (request.auth.uid != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['savedChats']));
+      
+      allow delete: if isAdmin();
+    }
+
+    match /usernames/{username} {
+      allow read;
+      allow create: if request.auth.uid != null;
+      allow delete: if request.auth.uid != null;
+      allow update: if false;
+    }
+    
+    match /friendRequests/{requestId} {
+      allow read, list: if request.auth != null && (resource.data.senderId == request.auth.uid || resource.data.receiverId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.senderId == request.auth.uid;
+      allow update: if request.auth != null && resource.data.receiverId == request.auth.uid;
+      allow delete: if request.auth != null && (resource.data.senderId == request.auth.uid || resource.data.receiverId == request.auth.uid);
+    }
+
+    match /config/settings {
+       allow read: if request.auth.uid != null;
+       allow write: if isAdmin();
+    }
+    
+    match /analytics/summary {
+      allow read: if request.auth != null;
+      allow write: if isAdmin(); 
+    }
+
+    match /broadcasts/{broadcastId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    match /chats/{chatId}/messages/{messageId} {
+      allow read: if request.auth.uid in chatId.split('_');
+      allow update, delete: if request.auth.uid == resource.data.senderId;
+      
+      allow create: if
+        request.auth.uid != null 
+        && request.resource.data.senderId == request.auth.uid
+        && (
+           // 1. Check if user is banned (default to false if field missing)
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isBanned', false) != true
+        )
+        && (
+           // 2. Check Plan & Limits
+           // If config missing, fail open (allow)
+           !exists(/databases/$(database)/documents/config/settings)
+           ||
+           // If user has a paid plan (not 'free'), allow
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('plan', 'free') != 'free'
+           ||
+           // If free plan, check daily limit
+           (
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('dailyMessageCount', 0)
+             < get(/databases/$(database)/documents/config/settings).data.dailyFreeLimit
+           )
+        );
+    }
+  }
+}

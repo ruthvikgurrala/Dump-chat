@@ -3,16 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
-
-// ... (keep existing code)
-
-
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 
 import Auth from './components/authentication/Auth';
 import Chat from './components/Chat';
 import AdminDashboard from './components/admin/AdminDashboard';
-import BroadcastReceiver from './components/broadcast/BroadcastReceiver';
 
 import './App.css';
 
@@ -37,9 +32,9 @@ const applyAccentColor = (accent) => {
 
 function App() {
   const [user, setUser] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
+  const [userProfile, setUserProfile] = useState(null); 
   const [loading, setLoading] = useState(true);
-  const [authError, setAuthError] = useState("");
+  const [authError, setAuthError] = useState(""); 
 
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'linear-dark');
   const [accent, setAccent] = useState(() => {
@@ -63,40 +58,22 @@ function App() {
     const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const userRef = doc(db, 'users', currentUser.uid);
-        const unsubscribeProfile = onSnapshot(userRef, async (userSnap) => {
+        const unsubscribeProfile = onSnapshot(userRef, (userSnap) => {
           if (userSnap.exists()) {
             const userData = userSnap.data();
             if (userData.isBanned === true) {
               setAuthError("This account has been suspended. Please contact support.");
               auth.signOut();
             } else {
-              setAuthError("");
+              setAuthError(""); 
               setUser(currentUser);
               setUserProfile(userData);
             }
           } else {
-            // User exists in Auth but not in Firestore (zombie state). Recreate the profile.
-            const newProfile = {
-              uid: currentUser.uid,
-              username: currentUser.displayName || currentUser.email.split('@')[0],
-              email: currentUser.email,
-              autoDump: true,
-              dailyMessageCount: 0,
-              plan: 'free',
-              createdAt: new Date().toISOString(),
-              isAdmin: false
-            };
-
-            try {
-              await setDoc(userRef, newProfile);
-              setUser(currentUser);
-              setUserProfile(newProfile);
-              setAuthError("");
-            } catch (err) {
-              console.error("Error recreating profile:", err);
-              setAuthError("Failed to restore user profile.");
-              auth.signOut();
-            }
+            setUser(null);
+            setUserProfile(null);
+            setAuthError("User profile not found. Please try logging in again.");
+            auth.signOut();
           }
           setLoading(false);
         }, (error) => {
@@ -130,16 +107,16 @@ function App() {
     <div className="app">
       {user && userProfile ? (
         userProfile.isAdmin ? (
-          <AdminDashboard
+          <AdminDashboard 
             user={userProfile}
-            theme={theme}
-            setTheme={setTheme}
-            accent={accent}
+            theme={theme} 
+            setTheme={setTheme} 
+            accent={accent} 
             setAccent={setAccent}
           />
         ) : (
           <Chat
-            userProfile={userProfile}
+            userProfile={userProfile} 
             theme={theme}
             setTheme={setTheme}
             accent={accent}
@@ -148,9 +125,6 @@ function App() {
         )
       ) : (
         <Auth authError={authError} setAuthError={setAuthError} />
-      )}
-      {user && userProfile && !userProfile.isAdmin && (
-        <BroadcastReceiver userProfile={userProfile} />
       )}
     </div>
   );

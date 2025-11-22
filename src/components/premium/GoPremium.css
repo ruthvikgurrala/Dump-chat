@@ -1,0 +1,184 @@
+/* src/components/premium/GoPremium.css */
+
+.go-premium-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  color: var(--text-primary);
+  /* The card styles have been explicitly added here to ensure they are not missed */
+  background-color: rgba(var(--rgb-secondary), 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 16px;
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  /* Increased glow effect by modifying the box-shadow */
+  box-shadow: 
+    0 0 20px rgba(var(--accent-rgb), 0.5),
+    0 0 40px rgba(var(--accent-rgb), 0.3),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+  height: 100%;
+  min-height: 0;
+}
+
+.go-premium-header {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+  gap: 15px;
+}
+
+.go-premium-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-primary);
+}
+
+.go-premium-container .back-button {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 10px 0 0;
+}
+
+.premium-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 20px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.premium-card {
+  background-color: var(--background-light);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  min-width: 250px;
+  max-width: 100%;
+}
+
+.premium-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.premium-card.highlight {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.premium-card .plan-name {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+.premium-card .plan-price {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.premium-card .plan-price span {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.premium-card .feature-list {
+  list-style: none;
+  margin: 1.5rem 0;
+  flex-grow: 1;
+}
+
+.premium-card .feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.premium-card .feature-list li svg {
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
+.premium-card .buy-btn {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--accent-primary);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.premium-card .buy-btn:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+}
+
+.premium-card .buy-btn:disabled {
+  background-color: var(--border-color);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.loading-message, .premium-error-message {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.premium-error-message {
+  color: #ef4444;
+}
+
+.bronze-border {
+  border-color: #cd7f32;
+  box-shadow: 0 0 10px rgba(205, 127, 50, 0.2);
+}
+.gold-border {
+  border-color: #ffd700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+.silver-border {
+  border-color: #c0c0c0;
+  box-shadow: 0 0 10px rgba(192, 192, 192, 0.2);
+}
+
+@media (max-width: 768px) {
+  .go-premium-container {
+    border-radius: 0;
+  }
+  .premium-grid {
+    grid-template-columns: 1fr;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+  .premium-card {
+    width: 100%;
+    max-width: 300px;
+  }
+  .go-premium-header h2 {
+    font-size: 18px;
+  }
+}

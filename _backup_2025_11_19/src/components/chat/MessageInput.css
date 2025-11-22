@@ -1,0 +1,71 @@
+/* src/components/chat/MessageInput.css */
+
+.message-input-form {
+  display: flex;
+  flex-direction: column;
+  padding: 15px 20px;
+  border-top: 1px solid var(--border-color);
+  gap: 10px;
+}
+
+/* New wrapper to correctly position input and button */
+.input-area-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.input-area-wrapper input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  background-color: var(--background-secondary);
+  color: var(--text-primary);
+  border-radius: 20px;
+  outline: none;
+}
+
+/* Updated button styling to restore correct height */
+.input-area-wrapper button {
+  padding: 12px 20px; /* Adjusted padding to match input height */
+  margin-left: 0;
+  border: none;
+  border-radius: 20px;
+  background-color: var(--accent-primary);
+  color: white;
+  cursor: pointer;
+  height: 40px; /* Explicit height for consistency */
+}
+
+
+/* Styles for the edit mode indicator */
+.edit-mode-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--background-tertiary);
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-radius: 12px 12px 0 0;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.edit-mode-indicator p {
+  margin: 0;
+  font-style: italic;
+}
+
+.edit-mode-indicator button {
+  padding: 4px 10px;
+  margin: 0;
+  border-radius: 8px;
+  background-color: var(--border-color);
+  color: var(--text-secondary);
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+}
+
+.edit-mode-indicator button:hover {
+  background-color: rgba(var(--rgb-secondary), 0.5);
+}

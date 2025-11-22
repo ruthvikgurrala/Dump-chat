@@ -1,22 +1,17 @@
 // src/components/Chat.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { auth, db } from '../firebase';
-import {
-  doc,
-  getDoc,
-  setDoc,
-  onSnapshot,
-  collection,
-  query,
-  orderBy,
-  limit,
-  getDocs,
-  where,
-  addDoc,
-  deleteDoc,
-  serverTimestamp,
-  arrayRemove,
-  arrayUnion
+import { 
+    doc, 
+    getDoc, 
+    setDoc, 
+    onSnapshot, 
+    collection, 
+    query, 
+    orderBy,
+    limit,
+    getDocs,
+    where
 } from 'firebase/firestore';
 import Sidebar from './chat/Sidebar';
 import ChatWindow from './chat/ChatWindow';
@@ -56,11 +51,11 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
   /* ---------------- CLOSE MENUS ON OUTSIDE CLICK ---------------- */
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isMenuOpen &&
-        settingsMenuRef.current &&
-        !settingsMenuRef.current.contains(event.target) &&
-        settingsBtnRef.current &&
-        !settingsBtnRef.current.contains(event.target)) {
+      if (isMenuOpen && 
+          settingsMenuRef.current && 
+          !settingsMenuRef.current.contains(event.target) &&
+          settingsBtnRef.current &&
+          !settingsBtnRef.current.contains(event.target)) {
         setIsMenuOpen(false);
       }
       if (isFriendRequestsOpen &&
@@ -139,7 +134,7 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
     let updatedChats;
     if (existingChatIndex !== -1) {
       updatedChats = activeChats.map(chat =>
-        chat.uid === user.uid
+        chat.uid === user.uid 
           ? { ...chat, lastMessageTimestamp: newTimestamp }
           : chat
       );
@@ -152,8 +147,8 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
     setSelectedChat(user);
 
     if (viewState !== 'chat') {
-      setHistoryStack(prev => [...prev, 'chat']);
-      setViewState('chat');
+        setHistoryStack(prev => [...prev, 'chat']);
+        setViewState('chat');
     }
   }, [activeChats, viewState]);
 
@@ -162,21 +157,21 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
   }, []);
 
   const handleNavigate = useCallback((newState) => {
-    setHistoryStack(prev => [...prev, newState]);
-    setViewState(newState);
-    setIsMenuOpen(false);
-    setIsFriendRequestsOpen(false);
+      setHistoryStack(prev => [...prev, newState]);
+      setViewState(newState);
+      setIsMenuOpen(false);
+      setIsFriendRequestsOpen(false);
   }, []);
 
   const goBack = useCallback(() => {
     setHistoryStack(prev => {
-      if (prev.length > 1) {
-        const newStack = prev.slice(0, -1);
-        setViewState(newStack[newStack.length - 1]);
-        return newStack;
-      }
-      setViewState('chat');
-      return ['chat'];
+        if (prev.length > 1) {
+            const newStack = prev.slice(0, -1);
+            setViewState(newStack[newStack.length - 1]);
+            return newStack;
+        }
+        setViewState('chat');
+        return ['chat'];
     });
   }, []);
 
@@ -197,42 +192,6 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
     setViewState('viewingOtherProfile');
   }, []);
 
-  const handleSendFriendRequest = useCallback(async (receiverId) => {
-    if (!auth.currentUser) return;
-    try {
-      await addDoc(collection(db, 'friendRequests'), {
-        senderId: auth.currentUser.uid,
-        receiverId: receiverId,
-        status: 'pending',
-        createdAt: serverTimestamp()
-      });
-    } catch (error) {
-      console.error("Error sending friend request:", error);
-    }
-  }, []);
-
-  const handleCancelFriendRequest = useCallback(async (receiverId) => {
-    if (!auth.currentUser) return;
-    try {
-      const q = query(
-        collection(db, 'friendRequests'),
-        where('senderId', '==', auth.currentUser.uid),
-        where('receiverId', '==', receiverId),
-        where('status', '==', 'pending')
-      );
-      const snapshot = await getDocs(q);
-      snapshot.forEach(async (doc) => {
-        await deleteDoc(doc.ref);
-      });
-    } catch (error) {
-      console.error("Error cancelling friend request:", error);
-    }
-  }, []);
-
-  const handleRespondToRequests = useCallback(() => {
-    setIsFriendRequestsOpen(true);
-  }, []);
-
   /* ---------------- CONTENT RENDER ---------------- */
   const renderContent = () => {
     switch (viewState) {
@@ -242,14 +201,11 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
       case 'myProfile':
         return (
           <div className="full-screen-view">
-            <ProfilePage
-              onBack={goBack}
-              userProfile={userProfile}
-              viewingUserId={auth.currentUser?.uid}
-              onViewFriendsList={handleViewFriendsList}
-              handleAddFriend={handleSendFriendRequest}
-              handleCancelFriendRequest={handleCancelFriendRequest}
-              onRespondToRequests={handleRespondToRequests}
+            <ProfilePage 
+              onBack={goBack} 
+              userProfile={userProfile} 
+              viewingUserId={auth.currentUser?.uid} 
+              onViewFriendsList={handleViewFriendsList} 
             />
           </div>
         );
@@ -257,20 +213,17 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
       case 'friendsList':
         return (
           <div className="dual-pane-layout">
-            <FriendsList
-              onBack={goBack}
-              friendsList={userProfile.friends || []}
-              onStartChat={handleStartChat}
-              onViewUser={handleViewFriendProfile}
+            <FriendsList 
+              onBack={goBack} 
+              friendsList={userProfile.friends || []} 
+              onStartChat={handleStartChat} 
+              onViewUser={handleViewFriendProfile} 
             />
-            <ProfilePage
-              onBack={goBack}
-              userProfile={userProfile}
-              viewingUserId={auth.currentUser?.uid}
-              onViewFriendsList={handleViewFriendsList}
-              handleAddFriend={handleSendFriendRequest}
-              handleCancelFriendRequest={handleCancelFriendRequest}
-              onRespondToRequests={handleRespondToRequests}
+            <ProfilePage 
+              onBack={goBack} 
+              userProfile={userProfile} 
+              viewingUserId={auth.currentUser?.uid} 
+              onViewFriendsList={handleViewFriendsList} 
             />
           </div>
         );
@@ -278,20 +231,17 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
       case 'viewingFriendProfile':
         return (
           <div className="dual-pane-layout">
-            <FriendsList
-              onBack={goBack}
-              friendsList={userProfile.friends || []}
-              onStartChat={handleStartChat}
-              onViewUser={handleViewFriendProfile}
+            <FriendsList 
+              onBack={goBack} 
+              friendsList={userProfile.friends || []} 
+              onStartChat={handleStartChat} 
+              onViewUser={handleViewFriendProfile} 
             />
-            <ProfilePage
-              onBack={goBack}
-              userProfile={userProfile}
-              viewingUserId={viewingUserId}
-              onStartChat={handleStartChat}
-              handleAddFriend={handleSendFriendRequest}
-              handleCancelFriendRequest={handleCancelFriendRequest}
-              onRespondToRequests={handleRespondToRequests}
+            <ProfilePage 
+              onBack={goBack} 
+              userProfile={userProfile} 
+              viewingUserId={viewingUserId} 
+              onStartChat={handleStartChat} 
             />
           </div>
         );
@@ -299,21 +249,18 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
       case 'viewingOtherProfile':
         return (
           <div className="dual-pane-layout">
-            <Sidebar
-              onStartChat={handleStartChat}
-              activeChats={activeChats}
-              onSelectChat={setSelectedChat}
-              selectedChat={selectedChat}
-              onViewUser={handleViewOtherProfile}
+            <Sidebar 
+              onStartChat={handleStartChat} 
+              activeChats={activeChats} 
+              onSelectChat={setSelectedChat} 
+              selectedChat={selectedChat} 
+              onViewUser={handleViewOtherProfile} 
             />
-            <ProfilePage
-              onBack={goBack}
-              userProfile={userProfile}
-              viewingUserId={viewingUserId}
-              onStartChat={handleStartChat}
-              handleAddFriend={handleSendFriendRequest}
-              handleCancelFriendRequest={handleCancelFriendRequest}
-              onRespondToRequests={handleRespondToRequests}
+            <ProfilePage 
+              onBack={goBack} 
+              userProfile={userProfile} 
+              viewingUserId={viewingUserId} 
+              onStartChat={handleStartChat} 
             />
           </div>
         );
@@ -322,17 +269,17 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
       default:
         return (
           <div className="dual-pane-layout">
-            <Sidebar
+            <Sidebar 
               onStartChat={handleStartChat}
               activeChats={activeChats}
               onSelectChat={setSelectedChat}
               selectedChat={selectedChat}
               onViewUser={handleViewOtherProfile}
             />
-            <ChatWindow
+            <ChatWindow 
               selectedChat={selectedChat}
               onBack={handleBack}
-              onMessageSent={() => { }}
+              onMessageSent={() => {}}
             />
           </div>
         );
@@ -363,7 +310,7 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
               />
             </div>
           )}
-          {isFriendRequestsOpen && (
+           {isFriendRequestsOpen && (
             <div ref={friendRequestsMenuRef} className="friend-requests-popover">
               <FriendRequests
                 onBack={() => setIsFriendRequestsOpen(false)}

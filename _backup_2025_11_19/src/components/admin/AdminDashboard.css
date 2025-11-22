@@ -1,0 +1,396 @@
+/* src/components/admin/AdminDashboard.css */
+
+.admin-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: var(--background-secondary);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.admin-header h1 {
+  font-size: 24px;
+  color: var(--accent-primary);
+}
+
+.admin-header span {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.admin-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  width: 220px;
+  padding: 20px 10px;
+  background-color: var(--background-secondary);
+  border-right: 1px solid var(--border-color);
+}
+
+.admin-nav button {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 8px;
+  border: none;
+  background-color: transparent;
+  color: var(--text-secondary);
+  font-size: 16px;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-nav button:hover {
+  background-color: var(--background-tertiary);
+  color: var(--text-primary);
+}
+
+.admin-nav button.active {
+  background-color: var(--accent-primary);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+}
+
+.admin-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* --- Styles for DashboardView --- */
+.stat-card {
+  background-color: var(--background-secondary);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 20px;
+  width: fit-content;
+  min-width: 200px;
+}
+
+.stat-card h3 {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.stat-card p {
+  font-size: 36px;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+/* Style for the banned users card */
+.stat-card-banned {
+  border-color: #ef4444; /* A standard red */
+}
+
+.stat-card-banned h3 {
+  color: #ef4444;
+}
+
+/* --- Styles for UsersView --- */
+.admin-search-bar {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px;
+  margin-bottom: 20px;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.users-table th,
+.users-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.users-table th {
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.users-table td button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--accent-primary);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.users-table td button:hover {
+  opacity: 0.8;
+}
+
+/* Additions for AdminDashboard.css */
+
+.user-search-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.user-search-form button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--accent-primary);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.user-search-form button.fetch-all-btn {
+  background-color: var(--background-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.search-error {
+  color: #ef4444; /* A standard red color for errors */
+  margin-bottom: 20px;
+}
+
+/* --- MOBILE RESPONSIVE LAYOUT --- */
+@media (max-width: 768px) {
+  /* Stack the main layout vertically on mobile */
+  .admin-body {
+    flex-direction: column;
+  }
+
+  /* Convert the sidebar into a horizontal nav bar at the top */
+  .admin-nav {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto; /* Allows scrolling if buttons don't fit */
+    padding: 10px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    /* Hide the scrollbar for a cleaner look */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .admin-nav::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+  }
+
+  /* Adjust nav buttons for the horizontal layout */
+  .admin-nav button {
+    width: auto; /* This is the fix */
+    flex-shrink: 0; /* Prevents buttons from squishing */
+    padding: 10px 15px;
+    margin-bottom: 0;
+    margin-right: 8px; /* Add space between buttons */
+  }
+
+  /* Reduce padding on mobile for more space */
+  .admin-header {
+    padding: 15px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .admin-content {
+    padding: 15px;
+  }
+
+  /* Make the user search form stack vertically */
+  .user-search-form {
+    flex-direction: column;
+    align-items: stretch; /* Makes buttons and input full width */
+  }
+
+  /* Make the table scroll horizontally instead of breaking the page */
+  .users-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap; /* Keeps table rows from wrapping */
+  }
+  
+  .admin-header .settings-menu {
+    right: auto; /* Unset the default right positioning */
+    left: 15px;  /* Position it from the left to match the header's padding */
+  }
+}
+
+/* Additions for AdminDashboard.css for the stats grid */
+
+.stats-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* This creates space between the cards */
+}
+
+.config-form {
+  max-width: 500px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.form-field label {
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.form-field input {
+  padding: 12px;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.config-form button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--accent-primary);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.save-message {
+  margin-top: 15px;
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+/* --- Styles to CUSTOMIZE the arrows on number inputs --- */
+
+/* Target the up/down buttons (spinners) in WebKit browsers */
+.config-form input[type="number"]::-webkit-inner-spin-button,
+.config-form input[type="number"]::-webkit-outer-spin-button {
+  /* This is a trick to change the arrow color */
+  /* It inverts the default black to white */
+  filter: invert(1);
+  
+  /* Adds a subtle opacity */
+  opacity: 0.5;
+  
+  /* Adds a transition for the hover effect */
+  transition: opacity 0.2s ease;
+}
+
+/* Make the arrows fully visible on hover */
+.config-form input[type="number"]::-webkit-inner-spin-button:hover,
+.config-form input[type="number"]::-webkit-outer-spin-button:hover {
+  opacity: 1;
+}
+
+
+/* --- Styles for Plan Selector in Users Table --- */
+.plan-selector {
+  padding: 8px;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+
+/* --- Styles for User Table Action Buttons --- */
+.action-buttons {
+  display: flex;
+  gap: 8px; /* Adds space between buttons */
+}
+
+.action-buttons button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.action-buttons button:hover {
+  opacity: 0.8;
+}
+
+/* Specific colors for each button type */
+.action-btn-reset {
+  background-color: #3b82f6; /* A nice blue */
+}
+
+.action-btn-ban {
+  background-color: var(--accent-primary);
+}
+
+
+/* --- Styles for User Filters --- */
+.user-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.user-filters button {
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  background-color: var(--background-tertiary);
+  color: var(--text-secondary);
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.user-filters button:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.user-filters button.active {
+  background-color: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+  font-weight: 600;
+}

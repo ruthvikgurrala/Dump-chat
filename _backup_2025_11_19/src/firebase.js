@@ -23,12 +23,5 @@ const getPublicConfig = httpsCallable(functions, 'getPublicConfig');
 const updateUsernameCallable = httpsCallable(functions, 'updateUsername');
 const acceptFriendRequestCallable = httpsCallable(functions, 'acceptFriendRequest');
 const unfriendUserCallable = httpsCallable(functions, 'unfriendUser');
-const broadcastMessageCallable = httpsCallable(functions, 'broadcastMessage');
 
-const deleteUserCallable = httpsCallable(functions, 'deleteUser');
-const updateAnalyticsCallable = httpsCallable(functions, 'updateAnalytics');
-const makeMeAdminCallable = httpsCallable(functions, 'makeMeAdmin');
-const updateUserAdminCallable = httpsCallable(functions, 'updateUserAdmin');
-const updateConfigAdminCallable = httpsCallable(functions, 'updateConfigAdmin');
-
-export { getPublicConfig, updateUsernameCallable, acceptFriendRequestCallable, unfriendUserCallable, broadcastMessageCallable, deleteUserCallable, updateAnalyticsCallable, makeMeAdminCallable, updateUserAdminCallable, updateConfigAdminCallable };
+export { getPublicConfig , updateUsernameCallable, acceptFriendRequestCallable, unfriendUserCallable };
