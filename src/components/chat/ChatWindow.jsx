@@ -15,7 +15,6 @@ import {
     getDoc as fetchSingleDoc,
     setDoc,
     arrayUnion,
-    arrayRemove,
     limit,
     startAfter
 } from 'firebase/firestore';
@@ -26,7 +25,7 @@ import MessageInput from './MessageInput';
 
 const MESSAGES_PAGE_SIZE = 20;
 
-const ChatWindow = ({ selectedChat, onBack, onMessageSent }) => {
+const ChatWindow = ({ selectedChat, onBack, onMessageSent, onMessageDeleted }) => {
     const [chatError, setChatError] = useState('');
     const [newMessage, setNewMessage] = useState('');
     const [messages, setMessages] = useState([]);
@@ -216,7 +215,6 @@ const ChatWindow = ({ selectedChat, onBack, onMessageSent }) => {
 
             const el = messagesListRef.current;
             const prevScrollHeight = el ? el.scrollHeight : 0;
-            // const prevScrollTop = el ? el.scrollTop : 0; // Unused
 
             const q = query(messagesRef, orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(MESSAGES_PAGE_SIZE));
             const snap = await getDocs(q);
@@ -294,53 +292,56 @@ const ChatWindow = ({ selectedChat, onBack, onMessageSent }) => {
         const text = newMessage;
         setNewMessage('');
 
-        // Optimistic Update
         const clientMessageId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-        const messageDataForFirestore = {
-            text: text,
-            createdAt: serverTimestamp(),
-            senderId: auth.currentUser.uid,
-            receiverId: selectedChat.uid,
-            seen: false,
-            edited: false,
-            clientMessageId: clientMessageId,
-        };
-
-        // Optimistic update
-        const optimisticMessage = {
-            id: `temp-${clientMessageId}`,
-            ...messageDataForFirestore,
-            createdAt: new Date(),
-            pending: true,
-            clientMessageId: clientMessageId,
-        };
-
-        setMessages(prev => [...prev, optimisticMessage]);
-        isAtBottomRef.current = true;
 
         try {
             if (messageToEdit) {
+                // Optimistic Update for Edit
+                setMessages(prev => prev.map(m =>
+                    m.id === messageToEdit.id ? { ...m, text, edited: true } : m
+                ));
+
                 await updateDoc(doc(db, 'chats', chatId, 'messages', messageToEdit.id), { text, edited: true });
                 setMessageToEdit(null);
             } else {
+                // Optimistic Update for New Message
+                const messageDataForFirestore = {
+                    text: text,
+                    createdAt: serverTimestamp(),
+                    senderId: auth.currentUser.uid,
+                    receiverId: selectedChat.uid,
+                    seen: false,
+                    edited: false,
+                    clientMessageId: clientMessageId,
+                };
+
+                const optimisticMessage = {
+                    id: `temp-${clientMessageId}`,
+                    ...messageDataForFirestore,
+                    createdAt: new Date(),
+                    pending: true,
+                    clientMessageId: clientMessageId,
+                };
+
+                setMessages(prev => [...prev, optimisticMessage]);
+                isAtBottomRef.current = true;
+
                 // Send to Firestore
                 await addDoc(collection(db, 'chats', chatId, 'messages'), messageDataForFirestore);
 
-                // Update savedChats for the SENDER only (so it appears in their list)
+                // Update savedChats for the SENDER only
                 const senderRef = doc(db, 'users', auth.currentUser.uid);
                 try {
                     await updateDoc(senderRef, {
                         savedChats: arrayUnion(selectedChat.uid)
                     });
                 } catch (err) {
-                    // If savedChats doesn't exist yet, create it
                     if (err.code === 'not-found' || err.message.includes('No document to update')) {
                         await setDoc(senderRef, { savedChats: [selectedChat.uid] }, { merge: true });
                     }
                 }
 
-                // Update daily message count for sender
+                // Update daily message count
                 try {
                     const senderSnapshot = await fetchSingleDoc(senderRef);
                     if (senderSnapshot && senderSnapshot.exists()) {
@@ -351,6 +352,9 @@ const ChatWindow = ({ selectedChat, onBack, onMessageSent }) => {
                 } catch (analyticsError) {
                     console.error('Error updating daily message count:', analyticsError);
                 }
+
+                // Notify parent to update sort order
+                if (onMessageSent) onMessageSent();
             }
         } catch (error) {
             console.error('Error sending message:', error, JSON.stringify(error));
@@ -358,7 +362,10 @@ const ChatWindow = ({ selectedChat, onBack, onMessageSent }) => {
                 ? "You have reached your daily message limit for the free plan."
                 : "Failed to send message. Please try again.");
 
-            setMessages(prev => prev.filter(m => m.clientMessageId !== clientMessageId));
+            // Revert optimistic update if needed
+            if (!messageToEdit) {
+                setMessages(prev => prev.filter(m => m.clientMessageId !== clientMessageId));
+            }
         }
     };
 
@@ -368,6 +375,7 @@ const ChatWindow = ({ selectedChat, onBack, onMessageSent }) => {
         await deleteDoc(doc(db, 'chats', chatId, 'messages', messageToDelete.id)).catch(err => console.error(err));
         setShowDeleteConfirm(false);
         setMessageToDelete(null);
+        if (onMessageDeleted) onMessageDeleted();
     };
 
     const handleEdit = (msg) => {

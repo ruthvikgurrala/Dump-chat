@@ -1,34 +1,34 @@
 rules_version = '2';
 
 service cloud.firestore {
-  // Helper function to check if the requesting user is an admin
-  function isAdmin() {
-    return request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
-  }
-
   match /databases/{database}/documents {
     
-    match /users/{userId} {
-      allow get, list: if request.auth.uid != null;
-      allow create: if request.auth.uid != null;
-      
-      // Allow update if:
-      // 1. User is updating their own doc AND NOT touching sensitive fields (plan, isAdmin, dailyMessageCount, isBanned)
-      // 2. User is an Admin
-      // 3. User is updating ONLY the 'savedChats' field (to add themselves to someone's chat list)
-      allow update: if (request.auth.uid == userId && 
-                        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['plan', 'isAdmin', 'dailyMessageCount', 'isBanned']))
-                    || isAdmin()
-                    || (request.auth.uid != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['savedChats']));
-      
-      allow delete: if isAdmin();
+    // Helper function to check if the requesting user is an admin
+    function isAdmin() {
+      return request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    match /usernames/{username} {
+    match /users/{userId} {
       allow read;
       allow create: if request.auth.uid != null;
       allow delete: if request.auth.uid != null;
-      allow update: if false;
+      
+      // Allow update if:
+      // 1. User is updating their own doc AND NOT touching sensitive fields (plan, isAdmin, isBanned)
+      //    AND if touching dailyMessageCount, it must be an increment of 1.
+      // 2. OR Admin
+      // 3. OR User updating only savedChats (legacy/backup rule)
+      allow update: if (request.auth.uid == userId && 
+                        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['plan', 'isAdmin', 'isBanned']) &&
+                        (
+                          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['dailyMessageCount']) ||
+                          (
+                            (!('dailyMessageCount' in resource.data) && request.resource.data.dailyMessageCount == 1) ||
+                            ('dailyMessageCount' in resource.data && request.resource.data.dailyMessageCount == resource.data.dailyMessageCount + 1)
+                          )
+                        ))
+                    || isAdmin()
+                    || (request.auth.uid != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['savedChats']));
     }
     
     match /friendRequests/{requestId} {

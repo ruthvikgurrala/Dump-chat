@@ -1,12 +1,10 @@
-const { onCall, HttpsError } = require("firebase-functions/v2/https"); // NEW: Import HttpsError
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
-const functions = require("firebase-functions/v1"); // Explicitly import v1
+const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
 const { getFirestore } = require("firebase-admin/firestore");
 
 admin.initializeApp();
-
-// ... (rest of the file) ...
 
 /**
  * Triggered when a new user is created in Firebase Auth.

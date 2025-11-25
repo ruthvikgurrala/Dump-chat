@@ -6,46 +6,19 @@ import {
     where,
     getDocs,
     doc,
-    onSnapshot,
     updateDoc,
     arrayUnion,
     arrayRemove,
-    deleteDoc,
-    getDoc
+    deleteDoc
 } from 'firebase/firestore';
 import './Sidebar.css';
 
-const Sidebar = ({ onStartChat, activeChats, onSelectChat, selectedChat, onViewUser }) => {
+const Sidebar = ({ onStartChat, activeChats, friendsTabChats, onSelectChat, selectedChat, onViewUser }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [activeTab, setActiveTab] = useState('active'); // 'active' | 'friends'
-    const [friendsTabChats, setFriendsTabChats] = useState([]);
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, user: null });
     const contextMenuRef = useRef(null);
-
-    // Fetch Friends Tab Data
-    useEffect(() => {
-        if (!auth.currentUser) return;
-        const userRef = doc(db, 'users', auth.currentUser.uid);
-        const unsubscribe = onSnapshot(userRef, async (userSnap) => {
-            if (userSnap.exists()) {
-                const userData = userSnap.data();
-                const friendsTabUids = userData.friendsTab || [];
-
-                if (friendsTabUids.length > 0) {
-                    const promises = friendsTabUids.map(async (uid) => {
-                        const friendSnap = await getDoc(doc(db, 'users', uid));
-                        return friendSnap.exists() ? { uid: friendSnap.id, ...friendSnap.data() } : null;
-                    });
-                    const friends = (await Promise.all(promises)).filter(f => f !== null);
-                    setFriendsTabChats(friends);
-                } else {
-                    setFriendsTabChats([]);
-                }
-            }
-        });
-        return () => unsubscribe();
-    }, []);
 
     // Close Context Menu on Outside Click
     useEffect(() => {
@@ -174,6 +147,7 @@ const Sidebar = ({ onStartChat, activeChats, onSelectChat, selectedChat, onViewU
     };
 
     // Filter activeChats to exclude anyone who is already in friendsTabChats
+    // Note: friendsTabChats is now passed as a prop
     const filteredActiveChats = activeChats.filter(chat =>
         !friendsTabChats.some(friend => friend.uid === chat.uid)
     );

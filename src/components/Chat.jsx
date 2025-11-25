@@ -30,6 +30,7 @@ import './Chat.css';
 const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeChats, setActiveChats] = useState([]);
+  const [friendsTabChats, setFriendsTabChats] = useState([]); // Lifted state
   const [selectedChat, setSelectedChat] = useState(null);
   const [autoDumpEnabled, setAutoDumpEnabled] = useState(true);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
@@ -77,7 +78,16 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
     };
   }, [isMenuOpen, isFriendRequestsOpen]);
 
-  /* ---------------- LOAD USER CHATS ---------------- */
+  /* ---------------- HELPER: GET LAST MESSAGE ---------------- */
+  const getLastMessage = async (otherUserId) => {
+    const chatId = [auth.currentUser.uid, otherUserId].sort().join('_');
+    const messagesRef = collection(db, 'chats', chatId, 'messages');
+    const q = query(messagesRef, orderBy('createdAt', 'desc'), limit(1));
+    const snap = await getDocs(q);
+    return snap.docs[0]?.data();
+  };
+
+  /* ---------------- LOAD USER CHATS (Active & Friends) ---------------- */
   useEffect(() => {
     if (!auth.currentUser) return;
     const userRef = doc(db, 'users', auth.currentUser.uid);
@@ -87,6 +97,7 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
         const autoDumpPref = userData.autoDump !== undefined ? userData.autoDump : true;
         setAutoDumpEnabled(autoDumpPref);
 
+        // 1. Load Active Chats (Saved Chats)
         if (autoDumpPref === false && userData.savedChats?.length > 0) {
           const chatPromises = userData.savedChats.map(async (uid) => {
             const chatUserSnap = await getDoc(doc(db, 'users', uid));
@@ -94,6 +105,7 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
             if (chatUserSnap.exists()) {
               return {
                 ...chatUserSnap.data(),
+                uid: chatUserSnap.id, // Ensure UID is present
                 lastMessageTimestamp: lastMessage?.createdAt?.toDate() || new Date(0),
               };
             }
@@ -104,6 +116,27 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
           setActiveChats(sortedChats);
         } else if (autoDumpPref === true) {
           setActiveChats([]);
+        }
+
+        // 2. Load Friends Tab Chats
+        if (userData.friendsTab?.length > 0) {
+          const friendPromises = userData.friendsTab.map(async (uid) => {
+            const friendSnap = await getDoc(doc(db, 'users', uid));
+            const lastMessage = await getLastMessage(uid);
+            if (friendSnap.exists()) {
+              return {
+                ...friendSnap.data(),
+                uid: friendSnap.id, // Ensure UID is present
+                lastMessageTimestamp: lastMessage?.createdAt?.toDate() || new Date(0),
+              };
+            }
+            return null;
+          });
+          const loadedFriends = (await Promise.all(friendPromises)).filter(f => f !== null);
+          const sortedFriends = loadedFriends.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+          setFriendsTabChats(sortedFriends);
+        } else {
+          setFriendsTabChats([]);
         }
       }
     });
@@ -124,38 +157,96 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
     return () => unsubscribe();
   }, [auth.currentUser?.uid]);
 
-  const getLastMessage = async (otherUserId) => {
-    const chatId = [auth.currentUser.uid, otherUserId].sort().join('_');
-    const messagesRef = collection(db, 'chats', chatId, 'messages');
-    const q = query(messagesRef, orderBy('createdAt', 'desc'), limit(1));
-    const snap = await getDocs(q);
-    return snap.docs[0]?.data();
-  };
-
-  /* ---------------- CHAT START ---------------- */
+  /* ---------------- CHAT HANDLERS ---------------- */
   const handleStartChat = useCallback(async (user) => {
     const newTimestamp = new Date();
-    const existingChatIndex = activeChats.findIndex(chat => chat.uid === user.uid);
-    let updatedChats;
-    if (existingChatIndex !== -1) {
-      updatedChats = activeChats.map(chat =>
-        chat.uid === user.uid
-          ? { ...chat, lastMessageTimestamp: newTimestamp }
-          : chat
-      );
-    } else {
-      const newChat = { ...user, lastMessageTimestamp: newTimestamp };
-      updatedChats = [newChat, ...activeChats];
-    }
-    const sortedChats = updatedChats.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
-    setActiveChats(sortedChats);
+
+    // Update Active Chats
+    setActiveChats(prev => {
+      const existingIndex = prev.findIndex(chat => chat.uid === user.uid);
+      let updated;
+      if (existingIndex !== -1) {
+        updated = prev.map(chat => chat.uid === user.uid ? { ...chat, lastMessageTimestamp: newTimestamp } : chat);
+      } else {
+        // Only add to active if not in friends tab (handled by Sidebar logic usually, but good to be safe)
+        // Actually, handleStartChat usually implies moving to active or just opening.
+        // For now, we just update timestamp if it exists, or add it.
+        // But wait, if it's in friendsTab, it shouldn't be in activeChats usually.
+        updated = [{ ...user, lastMessageTimestamp: newTimestamp }, ...prev];
+      }
+      return updated.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+    });
+
+    // Update Friends Tab Chats (if user is there)
+    setFriendsTabChats(prev => {
+      const existingIndex = prev.findIndex(chat => chat.uid === user.uid);
+      if (existingIndex !== -1) {
+        const updated = prev.map(chat => chat.uid === user.uid ? { ...chat, lastMessageTimestamp: newTimestamp } : chat);
+        return updated.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+      }
+      return prev;
+    });
+
     setSelectedChat(user);
 
     if (viewState !== 'chat') {
       setHistoryStack(prev => [...prev, 'chat']);
       setViewState('chat');
     }
-  }, [activeChats, viewState]);
+  }, [viewState]);
+
+  const handleMessageSent = useCallback(() => {
+    if (!selectedChat) return;
+    const newTimestamp = new Date();
+
+    // Update Active Chats
+    setActiveChats(prev => {
+      const existingIndex = prev.findIndex(chat => chat.uid === selectedChat.uid);
+      if (existingIndex !== -1) {
+        const updated = prev.map(chat => chat.uid === selectedChat.uid ? { ...chat, lastMessageTimestamp: newTimestamp } : chat);
+        return updated.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+      }
+      return prev;
+    });
+
+    // Update Friends Tab Chats
+    setFriendsTabChats(prev => {
+      const existingIndex = prev.findIndex(chat => chat.uid === selectedChat.uid);
+      if (existingIndex !== -1) {
+        const updated = prev.map(chat => chat.uid === selectedChat.uid ? { ...chat, lastMessageTimestamp: newTimestamp } : chat);
+        return updated.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+      }
+      return prev;
+    });
+  }, [selectedChat]);
+
+  const handleMessageDeleted = useCallback(async () => {
+    if (!selectedChat) return;
+
+    // Fetch the NEW last message (since the previous one was deleted)
+    const lastMsg = await getLastMessage(selectedChat.uid);
+    const newTimestamp = lastMsg?.createdAt?.toDate() || new Date(0); // Default to epoch if no messages left
+
+    // Update Active Chats
+    setActiveChats(prev => {
+      const existingIndex = prev.findIndex(chat => chat.uid === selectedChat.uid);
+      if (existingIndex !== -1) {
+        const updated = prev.map(chat => chat.uid === selectedChat.uid ? { ...chat, lastMessageTimestamp: newTimestamp } : chat);
+        return updated.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+      }
+      return prev;
+    });
+
+    // Update Friends Tab Chats
+    setFriendsTabChats(prev => {
+      const existingIndex = prev.findIndex(chat => chat.uid === selectedChat.uid);
+      if (existingIndex !== -1) {
+        const updated = prev.map(chat => chat.uid === selectedChat.uid ? { ...chat, lastMessageTimestamp: newTimestamp } : chat);
+        return updated.sort((a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp);
+      }
+      return prev;
+    });
+  }, [selectedChat]);
 
   const handleBack = useCallback(() => {
     setSelectedChat(null);
@@ -302,6 +393,7 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
             <Sidebar
               onStartChat={handleStartChat}
               activeChats={activeChats}
+              friendsTabChats={friendsTabChats} // Pass to Sidebar
               onSelectChat={setSelectedChat}
               selectedChat={selectedChat}
               onViewUser={handleViewOtherProfile}
@@ -325,6 +417,7 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
             <Sidebar
               onStartChat={handleStartChat}
               activeChats={activeChats}
+              friendsTabChats={friendsTabChats} // Pass to Sidebar
               onSelectChat={setSelectedChat}
               selectedChat={selectedChat}
               onViewUser={handleViewOtherProfile}
@@ -332,7 +425,8 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
             <ChatWindow
               selectedChat={selectedChat}
               onBack={handleBack}
-              onMessageSent={() => { }}
+              onMessageSent={handleMessageSent} // Pass handler
+              onMessageDeleted={handleMessageDeleted} // Pass delete handler
             />
           </div>
         );

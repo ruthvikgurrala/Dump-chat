@@ -8,10 +8,18 @@ const MessageInput = ({
   handleSendMessage,
   messageToEdit,
   cancelEdit,
-  messageInputRef
+  messageInputRef,
+  chatError,
+  setChatError
 }) => {
   return (
     <form onSubmit={handleSendMessage} className="message-input-form">
+      {chatError && (
+        <div className="chat-error-message">
+          <span>{chatError}</span>
+          <button type="button" onClick={() => setChatError('')}>×</button>
+        </div>
+      )}
       {messageToEdit && (
         <div className="edit-mode-indicator">
           <p>Editing message...</p>
