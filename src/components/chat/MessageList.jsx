@@ -66,7 +66,7 @@ const MessageList = forwardRef(({
             onMouseLeave={() => handleMessageMouseLeave?.(msg.id)}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.18 }}
+            transition={{ duration: 0.1 }}
           >
             <div className="message-content">
               <p>{msg.text}{msg.edited ? ' · edited' : ''}</p>

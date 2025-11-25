@@ -13,10 +13,11 @@ service cloud.firestore {
       allow create: if request.auth.uid != null;
       
       // Allow update if:
-      // 1. User is updating their own doc
+      // 1. User is updating their own doc AND NOT touching sensitive fields (plan, isAdmin, dailyMessageCount, isBanned)
       // 2. User is an Admin
       // 3. User is updating ONLY the 'savedChats' field (to add themselves to someone's chat list)
-      allow update: if request.auth.uid == userId 
+      allow update: if (request.auth.uid == userId && 
+                        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['plan', 'isAdmin', 'dailyMessageCount', 'isBanned']))
                     || isAdmin()
                     || (request.auth.uid != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['savedChats']));
       

@@ -1,0 +1,33 @@
+Context: Infrastructure Setup So Far I have manually provisioned a new Development environment in the Firebase Console to separate "Dev" from "Prod".
+
+New Project: Created wispchat-dev.
+
+Services Enabled:
+
+Authentication: Enabled Email/Password. Created dummy accounts (test@wisp.com, admin@wisp.com).
+
+Firestore: Enabled in region asia-south1. Applied production-mirror security rules.
+
+Storage: Skipped for now.
+
+Goal: I now need to configure my local environment to talk to this new project safely without breaking my main branch.
+
+Task: Local Branching & Deployment Please execute the following terminal commands to set up the local workspace:
+
+Git Safety:
+
+Create and switch to a new git branch named feature/dev-environment.
+
+Reason: This ensures any config changes (like .firebaserc) don't accidentally get pushed to main until tested.
+
+Firebase CLI Configuration:
+
+Run firebase use --add to link the new remote project (wispchat-dev) to this directory.
+
+Set the alias for this project as dev.
+
+Run firebase use dev to confirm we are targeting the sandbox.
+
+Deploy Logic:
+
+Run firebase deploy --only functions to push the existing backend logic to the new wispchat-dev cloud environment.

@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "dump-chat-d5058"
-  }
+    "default": "dump-chat-d5058",
+    "dev": "wispchat-dev"
+  },
+  "targets": {},
+  "etags": {}
 }

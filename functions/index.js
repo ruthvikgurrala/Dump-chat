@@ -1,10 +1,45 @@
-// functions/index.js
 const { onCall, HttpsError } = require("firebase-functions/v2/https"); // NEW: Import HttpsError
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const functions = require("firebase-functions/v1"); // Explicitly import v1
 const admin = require("firebase-admin");
 const { getFirestore } = require("firebase-admin/firestore");
 
 admin.initializeApp();
+
+// ... (rest of the file) ...
+
+/**
+ * Triggered when a new user is created in Firebase Auth.
+ * Securely initializes the user document in Firestore with default values.
+ */
+exports.onUserCreated = functions.auth.user().onCreate(async (user) => {
+  const db = getFirestore();
+  const { uid, email } = user;
+
+  console.log(`New user created: ${uid}, ${email}`);
+
+  try {
+    // Check if document already exists (edge case if client created it first)
+    // If it exists, we overwrite the sensitive fields to be safe.
+    const userRef = db.collection('users').doc(uid);
+
+    await userRef.set({
+      uid: uid,
+      email: email,
+      plan: 'free',            // SECURE DEFAULT
+      dailyMessageCount: 0,    // SECURE DEFAULT
+      isAdmin: false,          // SECURE DEFAULT
+      isBanned: false,         // SECURE DEFAULT
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      // We don't set username here because it might not be available yet.
+      // The client sets the username via updateProfile/updateUsername.
+    }, { merge: true });
+
+    console.log(`User document initialized for ${uid}`);
+  } catch (error) {
+    console.error("Error initializing user document:", error);
+  }
+});
 
 exports.calculateAnalytics = onSchedule("every 1 hours", async (event) => {
   console.log("Executing scheduled analytics calculation...");
@@ -375,15 +410,7 @@ exports.deleteUser = onCall({ cors: true }, async (request) => {
   }
 });
 
-exports.makeMeAdmin = onCall({ cors: true }, async (request) => {
-  const db = getFirestore();
-  const callerUid = request.auth.uid;
-  if (!callerUid) throw new HttpsError('unauthenticated', 'Authentication required.');
 
-  // Bypass all rules and set isAdmin to true
-  await db.collection('users').doc(callerUid).update({ isAdmin: true });
-  return { success: true };
-});
 
 exports.updateAnalytics = onCall({ cors: true }, async (request) => {
   // Manually trigger the analytics calculation
