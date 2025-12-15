@@ -28,13 +28,14 @@ const Auth = ({ authError, setAuthError }) => {
             setAuthError("Please enter a username.");
             return;
         }
-        const usernameRef = doc(db, "usernames", username);
-        const usernameSnap = await getDoc(usernameRef);
-        if (usernameSnap.exists()) {
-            setAuthError("Username is already taken. Please choose another one.");
-            return;
-        }
         try {
+            const usernameRef = doc(db, "usernames", username);
+            const usernameSnap = await getDoc(usernameRef);
+            if (usernameSnap.exists()) {
+                setAuthError("Username is already taken. Please choose another one.");
+                return;
+            }
+
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             await updateProfile(user, { displayName: username });
