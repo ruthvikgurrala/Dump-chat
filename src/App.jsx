@@ -88,7 +88,7 @@ function App() {
             };
 
             try {
-              await setDoc(userRef, newProfile);
+              await setDoc(userRef, newProfile, { merge: true });
               setUser(currentUser);
               setUserProfile(newProfile);
               setAuthError("");
