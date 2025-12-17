@@ -23,6 +23,8 @@
   color: var(--text-primary);
   border-radius: 20px;
   outline: none;
+  font-size: 16px;
+  /* Prevents auto-zoom on iOS */
 }
 
 /* Updated button styling to restore correct height */

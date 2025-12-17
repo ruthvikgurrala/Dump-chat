@@ -3,16 +3,21 @@
 .profile-page-container {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Fill the parent height */
-  background-color: var(--background-secondary); /* Consistent with GoPremium page */
-  border-radius: 16px; /* Match chat window border radius */
-  overflow: hidden; /* Ensure content doesn't spill out */
+  height: 100%;
+  /* Fill the parent height */
+  background-color: var(--background-secondary);
+  /* Consistent with GoPremium page */
+  border-radius: 16px;
+  /* Match chat window border radius */
+  overflow: hidden;
+  /* Ensure content doesn't spill out */
   color: var(--text-primary);
 }
 
 .profile-header {
   display: flex;
-  justify-content: space-between; /* Distribute items */
+  justify-content: space-between;
+  /* Distribute items */
   align-items: center;
   padding: 15px 20px;
   border-bottom: 1px solid var(--border-color);
@@ -73,8 +78,10 @@
 }
 
 .action-btn.cancel-btn {
-  background-color: #ef4444; /* Red for cancel */
+  background-color: #ef4444;
+  /* Red for cancel */
 }
+
 .action-btn.cancel-btn:hover {
   background-color: #dc2626;
 }
@@ -86,7 +93,8 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center content horizontally */
+  align-items: center;
+  /* Center content horizontally */
   gap: 30px;
 }
 
@@ -98,18 +106,23 @@
   text-align: center;
   width: 100%;
   max-width: 400px;
-  margin-bottom: 10px; /* Space below message */
+  margin-bottom: 10px;
+  /* Space below message */
 }
 
 .profile-message.success {
-  background-color: rgba(34, 197, 94, 0.1); /* Green background */
-  color: #22c55e; /* Green text */
+  background-color: rgba(34, 197, 94, 0.1);
+  /* Green background */
+  color: #22c55e;
+  /* Green text */
   border: 1px solid #22c55e;
 }
 
 .profile-message.error {
-  background-color: rgba(239, 68, 68, 0.1); /* Red background */
-  color: #ef4444; /* Red text */
+  background-color: rgba(239, 68, 68, 0.1);
+  /* Red background */
+  color: #ef4444;
+  /* Red text */
   border: 1px solid #ef4444;
 }
 
@@ -147,7 +160,8 @@
 
 .profile-info-section {
   width: 100%;
-  max-width: 400px; /* Limit width for readability */
+  max-width: 400px;
+  /* Limit width for readability */
   background-color: var(--background-light);
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -177,37 +191,43 @@
 .info-label {
   font-weight: 600;
   color: var(--text-secondary);
-  width: 90px; /* Fixed width for labels */
+  width: 90px;
+  /* Fixed width for labels */
   flex-shrink: 0;
 }
 
 .info-value {
   flex-grow: 1;
   color: var(--text-primary);
-  word-break: break-all; /* Break long words */
+  word-break: break-all;
+  /* Break long words */
 }
 
 /* NEW: Styles for editable inputs/textareas */
 .editable-input,
 .editable-textarea {
   flex-grow: 1;
-  width: 100%; /* Take full width of its flex container */
+  width: 100%;
+  /* Take full width of its flex container */
   padding: 8px;
   border: 1px solid var(--border-color);
   background-color: var(--background-dark);
   color: var(--text-primary);
   border-radius: 5px;
-  font-size: 0.95rem;
+  font-size: 16px;
+  /* Prevents auto-zoom on iOS */
   line-height: 1.5;
 }
 
 .editable-textarea {
-  resize: vertical; /* Allow vertical resizing */
+  resize: vertical;
+  /* Allow vertical resizing */
   min-height: 60px;
 }
 
 .bio-item {
-  align-items: flex-start; /* Align icon and label to top for bio */
+  align-items: flex-start;
+  /* Align icon and label to top for bio */
 }
 
 .view-friends-btn {
@@ -228,26 +248,37 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .profile-page-container {
-    border-radius: 0; /* No border-radius on full-screen mobile */
+    border-radius: 0;
+    /* No border-radius on full-screen mobile */
   }
+
   .profile-header {
-    flex-wrap: wrap; /* Allow header items to wrap */
+    flex-wrap: wrap;
+    /* Allow header items to wrap */
     justify-content: center;
   }
+
   .profile-actions {
-    width: 100%; /* Make action buttons take full width */
+    width: 100%;
+    /* Make action buttons take full width */
     justify-content: center;
   }
+
   .profile-content {
     padding: 15px;
   }
+
   .profile-info-section {
     padding: 15px;
   }
+
   .info-item {
-    flex-wrap: wrap; /* Allow items to wrap on very small screens */
+    flex-wrap: wrap;
+    /* Allow items to wrap on very small screens */
   }
+
   .info-label {
-    width: auto; /* Auto width on small screens */
+    width: auto;
+    /* Auto width on small screens */
   }
 }

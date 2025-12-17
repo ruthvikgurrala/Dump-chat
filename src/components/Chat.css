@@ -4,8 +4,12 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
+  /* Dynamic viewport height for mobile browsers */
   width: 100vw;
   background-color: var(--background-primary);
+  overflow: hidden;
+  /* Prevent body scroll */
 }
 
 /* HEADER */
@@ -17,11 +21,9 @@
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
   border-radius: 16px 16px 0 0;
-  background-image: linear-gradient(
-    to right,
-    var(--background-secondary),
-    var(--background-tertiary)
-  );
+  background-image: linear-gradient(to right,
+      var(--background-secondary),
+      var(--background-tertiary));
 }
 
 .chat-header h1 {
@@ -96,7 +98,7 @@
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.03);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03);
   overflow: hidden;
   height: 350px;
   display: flex;
@@ -116,40 +118,46 @@
 }
 
 /* Base style for all content cards that can be a full screen or part of a split layout */
-.chat-body > .card {
+.chat-body>.card {
   flex: 1;
   width: 100%;
 }
 
 @media (min-width: 768px) {
-  .sidebar { width: 350px; flex-shrink: 0; }
-  .chat-window { flex: 1; }
-  
-  /* Layout for full screen views (e.g., GoPremium, My Profile) */
-  .chat-body > .full-screen-view {
-      width: 100%;
-      flex: 1;
-  }
-  
-  /* Layout for dual pane views */
-  .dual-pane-layout {
-      display: flex;
-      flex-direction: row;
-      flex: 1;
-      gap: 16px;
-  }
-  
-  .dual-pane-layout > .friends-list-container, 
-  .dual-pane-layout > .sidebar {
-      flex-grow: 0;
-      flex-shrink: 0;
-      width: 350px;
+  .sidebar {
+    width: 350px;
+    flex-shrink: 0;
   }
 
-  .dual-pane-layout > .profile-page-container,
-  .dual-pane-layout > .chat-window {
-      flex: 1;
-      width: auto;
+  .chat-window {
+    flex: 1;
+  }
+
+  /* Layout for full screen views (e.g., GoPremium, My Profile) */
+  .chat-body>.full-screen-view {
+    width: 100%;
+    flex: 1;
+  }
+
+  /* Layout for dual pane views */
+  .dual-pane-layout {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    gap: 16px;
+  }
+
+  .dual-pane-layout>.friends-list-container,
+  .dual-pane-layout>.sidebar {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 350px;
+  }
+
+  .dual-pane-layout>.profile-page-container,
+  .dual-pane-layout>.chat-window {
+    flex: 1;
+    width: auto;
   }
 }
 
@@ -157,20 +165,46 @@
   .chat-body {
     padding: 0;
   }
-  .sidebar {
-    border-right: none !important;
-  }
-  .chat-body > .sidebar,
-  .chat-body > .chat-window,
-  .chat-body > .card {
+
+  /* Shared Mobile Styles for Panes */
+  /* Shared Mobile Styles for Panes */
+  .chat-body .sidebar,
+  .chat-body .chat-window,
+  .chat-body .card,
+  .chat-body .friends-list-container,
+  .chat-body .profile-page-container {
     width: 100%;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-  }
-  .chat-body.show-chat-window .sidebar {
-    display: none;
-  }
-  .chat-body > .card {
+    height: 100%;
     border-radius: 0;
+    border-right: none !important;
+  }
+
+  /* Ensure dual-pane layout container doesn't create extra space or scroll */
+  .dual-pane-layout {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* --- TOGGLE LOGIC --- */
+
+  /* DEFAULT: Show Left Pane (Sidebar, Friends List), Hide Right Pane (Chat, Profile) */
+  .chat-body:not(.mobile-show-right-pane) .chat-window,
+  .chat-body:not(.mobile-show-right-pane) .profile-page-container {
+    display: none !important;
+  }
+
+  /* ACTIVE: Show Right Pane, Hide Left Pane */
+  .chat-body.mobile-show-right-pane .sidebar,
+  .chat-body.mobile-show-right-pane .friends-list-container {
+    display: none !important;
+  }
+
+  /* Ensure Full Screen Views are always 100% */
+  .chat-body .full-screen-view {
+    width: 100% !important;
+    display: block;
   }
 }

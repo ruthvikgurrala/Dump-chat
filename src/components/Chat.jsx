@@ -433,6 +433,14 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
     }
   };
 
+  /* ---------------- MOBILE TOGGLE LOGIC ---------------- */
+  // Determine if we should show the "Right Pane" (Chat, Profile, etc.) on mobile
+  const showRightPaneOnMobile =
+    (viewState === 'chat' && !!selectedChat) ||
+    viewState === 'viewingFriendProfile' ||
+    viewState === 'viewingOtherProfile' ||
+    viewState === 'myProfile';
+
   return (
     <div className="chat-container">
       <div className="chat-header">
@@ -468,7 +476,7 @@ const Chat = ({ theme, setTheme, accent, setAccent, userProfile }) => {
           )}
         </div>
       </div>
-      <div className="chat-body">
+      <div className={`chat-body ${showRightPaneOnMobile ? 'mobile-show-right-pane' : ''}`}>
         {renderContent()}
       </div>
     </div>

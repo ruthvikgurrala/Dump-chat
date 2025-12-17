@@ -32,7 +32,8 @@
   /* thicker border */
   background-color: var(--background-secondary);
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: 16px;
+  /* Prevents auto-zoom on iOS */
 }
 
 .sidebar-search button {

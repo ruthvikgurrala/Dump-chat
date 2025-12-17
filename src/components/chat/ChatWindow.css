@@ -9,12 +9,13 @@
   border: 1px solid rgba(var(--accent-rgb), 0.4);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 
+  box-shadow:
     0 0 15px rgba(var(--accent-rgb), 0.25),
     0 0 30px rgba(var(--accent-rgb), 0.12),
-    inset 0 1px 0 rgba(255,255,255,0.03);
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
   height: 100%;
-  min-height: 0; /* allow children to shrink */
+  min-height: 0;
+  /* allow children to shrink */
 }
 
 .chat-window-empty {
@@ -44,8 +45,10 @@
   padding: 10px 15px;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* critical fix for flexbox scroll */
-  overflow: hidden; /* Ensure it doesn't spill over */
+  min-height: 0;
+  /* critical fix for flexbox scroll */
+  overflow: hidden;
+  /* Ensure it doesn't spill over */
 }
 
 .back-button {
@@ -57,11 +60,7 @@
   padding: 0 10px 0 0;
 }
 
-@media (max-width: 767px) {
-  .chat-window {
-    height: calc(100vh - 64px);
-  }
-}
+
 
 /* Delete Confirmation Modal */
 .confirm-delete-overlay {
